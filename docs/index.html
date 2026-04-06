@@ -120,11 +120,12 @@ function sendData(e) {
     const inputs = div.querySelectorAll("input");
 
     personen.push({
-      naam: inputs[0].value,
-      leeftijd: inputs[1].value,
-      telefoon: inputs[2].value,
-      email: inputs[3].value
-    });
+  naam: inputs[0].value,
+  leeftijd: inputs[1].value,
+  telefoon: inputs[2].value,
+  email: inputs[3].value,
+  sheet: "Sheet1"
+});
   });
 
   if (personen.length === 0) {
