@@ -8,6 +8,8 @@ let beschikbarePlekken = 0;
 // ➕ Persoon toevoegen
 function addPersoon() {
   const container = document.getElementById("personen");
+  if (!container) return; // 🔥 voorkomt error
+
   const count = container.children.length + 1;
 
   const div = document.createElement("div");
@@ -27,12 +29,12 @@ function addPersoon() {
 // ❌ verwijderen
 function removeLast() {
   const container = document.getElementById("personen");
-  if (container.lastElementChild) {
+  if (container && container.lastElementChild) {
     container.lastElementChild.remove();
   }
 }
 
-// 📊 teller + titel ophalen
+// 📊 teller ophalen
 function updateCount() {
   const script = document.createElement("script");
   script.src = URL + "?sheet=" + sheetName + "&callback=handleCount";
@@ -42,7 +44,7 @@ function updateCount() {
 function handleCount(data) {
   beschikbarePlekken = data.left;
 
-  // 👇 titel komt nu uit spreadsheet
+  // titel uit sheet
   document.getElementById("titel").innerText = data.name;
 
   const status = document.getElementById("status");
@@ -109,8 +111,10 @@ function sendData(e) {
   });
 }
 
-// 🚀 START
-addPersoon();
-updateCount();
-setInterval(updateCount, 2000);
+// 🚀 START (pas als pagina geladen is)
+window.onload = function () {
+  addPersoon();
+  updateCount();
+  setInterval(updateCount, 2000);
+};
 </script>
