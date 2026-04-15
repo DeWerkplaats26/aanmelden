@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <head>
-  <img src="logo.jpeg" alt="De Werkplaats" style="width: 300px; margin-bottom: 20px;">
   <title>Workshop aanmelden</title>
-  <p id="status">Laden...</p>
+
   <style>
     body {
       font-family: Arial;
       background: #f3eeeb;
       text-align: center;
     }
-    <img>
-<p id="status">
+
     .box {
       background: white;
       padding: 25px;
@@ -21,12 +20,14 @@
       max-width: 400px;
       border-radius: 12px;
     }
+
     input, button {
       width: 90%;
       padding: 12px;
       font-size: 16px;
       margin: 6px;
     }
+
     button {
       background: #645dd1;
       color: white;
@@ -34,17 +35,20 @@
       cursor: pointer;
       border-radius: 25px;
     }
+
     .persoon {
       border-top: 1px solid #ddd;
       margin-top: 10px;
       padding-top: 10px;
     }
-    .remove {
-      background: #999;
-    }
   </style>
 </head>
+
 <body>
+
+<!-- ✅ verplaatst naar body -->
+<img src="logo.jpeg" style="width: 300px; margin-bottom: 20px;">
+<p id="statusTop">Laden...</p>
 
 <div class="box">
   <h2 id="titel"></h2>
@@ -53,20 +57,23 @@
   <form onsubmit="sendData(event)">
     <div id="personen"></div>
 
-  <button type="submit" id="btn">Aanmelden</button>
-<button type="button" onclick="addPersoon()">+ Persoon toevoegen</button>
-<button type="button" onclick="removeLast()">Verwijderen</button>
+    <button type="submit" id="btn">Aanmelden</button>
+    <button type="button" onclick="addPersoon()">+ Persoon toevoegen</button>
+    <button type="button" onclick="removeLast()">Verwijderen</button>
+  </form>
 
   <p id="melding"></p>
 </div>
 
 <script>
-
 const params = new URLSearchParams(window.location.search);
 const sheetName = params.get("sheet") || "Sheet1";
-  
+
 const URL = "https://script.google.com/macros/s/AKfycbypPFBDmABPfDLdwWFosDjUimPlt1eoTL8ttGOXRUVmIe2my5dn9h4yPnpxn9Q0OHhznA/exec";
 let beschikbarePlekken = 0;
+
+// titel zetten
+document.getElementById("titel").innerText = sheetName;
 
 // ➕ Persoon toevoegen
 function addPersoon() {
@@ -125,12 +132,12 @@ function sendData(e) {
   personenDivs.forEach(div => {
     const inputs = div.querySelectorAll("input");
 
-  personen.push({
-  naam: inputs[0].value,
-  leeftijd: inputs[1].value,
-  telefoon: inputs[2].value,
-  email: inputs[3].value,
-  sheet: sheetName
+    personen.push({
+      naam: inputs[0].value,
+      leeftijd: inputs[1].value,
+      telefoon: inputs[2].value,
+      email: inputs[3].value,
+      sheet: sheetName
     });
   });
 
@@ -139,9 +146,7 @@ function sendData(e) {
     return;
   }
 
-  const aantal = personen.length;
-
-  if (aantal > beschikbarePlekken) {
+  if (personen.length > beschikbarePlekken) {
     alert("Er zijn nog maar " + beschikbarePlekken + " plekken!");
     return;
   }
@@ -173,7 +178,6 @@ function sendData(e) {
 addPersoon();
 updateCount();
 setInterval(updateCount, 2000);
-document.getElementById("titel").innerText = sheetName;
 </script>
 
 </body>
