@@ -50,14 +50,68 @@
 <p id="statusTop">Laden...</p>
 
 <div class="box">
-  <h2 id="titel">Workshop</h2>
-  <p id="status">Laden...</p>
+  <h2>Workshop Resin Art</h2>
+
+<p style="text-align:left;">
+<strong>Maak jouw eigen unieke accessoires!</strong>
+</p>
+
+<p style="text-align:left;">
+Laat je creativiteit schitteren tijdens deze kleurrijke Resin Art-workshop!
+Je gaat aan de slag met epoxyhars en maakt diverse prachtige creaties:
+een boekenlegger, een pen en een sleutelhanger.
+Kies jouw favoriete kleuren, voeg glitters, bloemen, folie of andere decoraties toe en maak elk item helemaal uniek.
+Wil je het extra persoonlijk maken? Voeg dan je eigen naam toe aan je creaties!
+</p>
+
+<p style="text-align:left;">
+Tijdens de workshop ontdek je hoe je met resin werkt en ontwerp je stap voor stap je eigen accessoires.
+Het resultaat? Drie unieke, handgemaakte items die je zelf kunt gebruiken of cadeau kunt geven.
+</p>
+
+<table style="width:100%;text-align:left;border-collapse:collapse;margin-bottom:20px;">
+<tr>
+<td><strong>Datum:</strong></td>
+<td>maandag 19 oktober</td>
+</tr>
+
+<tr>
+<td><strong>Tijd:</strong></td>
+<td>13.30 – 16.00 uur</td>
+</tr>
+
+<tr>
+<td><strong>Locatie:</strong></td>
+<td>Mulderweg 1a</td>
+</tr>
+
+<tr>
+<td><strong>Leeftijd:</strong></td>
+<td>vanaf 8 jaar</td>
+</tr>
+
+<tr>
+<td><strong>Maximaal:</strong></td>
+<td>8 deelnemers</td>
+</tr>
+
+<tr>
+<td><strong>Kosten:</strong></td>
+<td>€30 per persoon (inclusief alle materialen, drinken en iets lekkers)</td>
+</tr>
+
+<p style="text-align:left;">
+Na aanmelding geen bevestiging ontvangen? Controleer dan ook je spam.
+</p>
+</table>
+
+<p id="status">Laden...</p>
 
   <form onsubmit="sendData(event)">
     <div id="personen"></div>
 
     <button type="submit" id="btn">Aanmelden</button>
-    <button type="button" onclick="addPersoon()">+ Persoon toevoegen</button>
+    <button type="button" id="addBtn" onclick="addPersoon()">+ Persoon toevoegen</button>
     <button type="button" onclick="removeLast()">Verwijderen</button>
   </form>
 
@@ -66,14 +120,21 @@
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const sheetIndex = 0;
+const sheetIndex = 2;
 
-const URL = "https://script.google.com/macros/s/AKfycbypPFBDmABPfDLdwWFosDjUimPlt1eoTL8ttGOXRUVmIe2my5dn9h4yPnpxn9Q0OHhznA/exec";
+const URL = "https://script.google.com/macros/s/AKfycbwTQuKZuv_YlrO-5RCUs9jR01KSWSrx6Txja6gQrONzfxxLj-8Uw8NBDfY8RDduzZ86HA/exec";
 
-let beschikbarePlekken = 10;
+let beschikbarePlekken = 8;
+let aanmeldenBezig = false;
 
 // ➕ toevoegen
 function addPersoon() {
+
+  if (document.querySelectorAll(".persoon").length >= beschikbarePlekken) {
+    alert("Er zijn niet genoeg plaatsen meer beschikbaar.");
+    return;
+  }
+
   const container = document.getElementById("personen");
   if (!container) return;
 
@@ -111,33 +172,64 @@ function updateCount() {
 
 function handleCount(data) {
   try {
-    beschikbarePlekken = data.left || 10;
-
-    const titel = document.getElementById("titel");
-    if (titel) titel.innerText = data.name || "Workshop";
+    beschikbarePlekken = data.left ?? 8;
 
     const status = document.getElementById("status");
-    if (status) {
+    const btn = document.getElementById("btn");
+    const addBtn = document.getElementById("addBtn");
+
+    if (beschikbarePlekken === 0) {
+      status.innerText = "❌ Deze workshop is vol";
+      btn.disabled = true;
+      btn.style.background = "#999";
+    } else {
       status.innerText = beschikbarePlekken + " plekken beschikbaar";
+
+      if (!aanmeldenBezig) {
+        btn.disabled = false;
+        btn.style.background = "#645dd1";
+      }
     }
 
-    const top = document.getElementById("statusTop");
-    if (top) top.innerText = "Aanmelden workshop";
+    if (beschikbarePlekken <= 1) {
+      addBtn.disabled = true;
+      addBtn.style.background = "#999";
+    } else {
+      addBtn.disabled = false;
+      addBtn.style.background = "#645dd1";
+    }
+
+    document.getElementById("statusTop").innerText = "Aanmelden workshop";
 
   } catch (e) {
     console.log(e);
   }
 }
-
+  
 // 🚀 verzenden
 function sendData(e) {
   e.preventDefault();
 
+  const btn = document.getElementById("btn");
+
+  // Knop direct uitschakelen
+  btn.disabled = true;
+  btn.innerText = "Bezig met aanmelden...";
+  aanmeldenBezig = true;
+
+  if (beschikbarePlekken <= 0) {
+  alert("Deze workshop is vol.");
+  btn.disabled = false;
+  btn.innerText = "Aanmelden";
+  return;
+}
   const inputs = document.querySelectorAll(".persoon input");
   if (inputs.length === 0) {
-    alert("Voeg eerst een persoon toe");
-    return;
-  }
+  alert("Voeg eerst een persoon toe");
+  btn.disabled = false;
+  btn.innerText = "Aanmelden";
+  return;
+}
 
   let personen = [];
 
@@ -154,16 +246,21 @@ function sendData(e) {
   document.getElementById("melding").innerText = "Bezig...";
 
   fetch(URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify(personen)
-  })
-  .then(() => {
-    document.getElementById("melding").innerText = "✅ Gelukt!";
-  })
-  .catch(() => {
-    document.getElementById("melding").innerText = "❌ Fout";
-  });
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify(personen)
+})
+.then(() => {
+  document.getElementById("melding").innerText = "✅ Gelukt!";
+  btn.innerText = "Aanmelding verzonden";
+})
+.catch(() => {
+  document.getElementById("melding").innerText = "❌ Er ging iets mis. Probeer het opnieuw.";
+
+  aanmeldenBezig = false;
+  btn.disabled = false;
+  btn.innerText = "Aanmelden";
+});
 }
 
 // START
